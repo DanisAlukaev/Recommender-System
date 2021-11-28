@@ -90,7 +90,7 @@ object MovieLensALS {
     val usageString = "\n\nUsage: path/to/spark-submit path/to/jar movie/lens/data/path -user [true/false]\n\n"
 
     // instances instantiated with var can be modified
-    var doGrading = args(1)=="true"
+    var doGrading = args(1) == "true"
 
     val rank = args(2).toInt
 
@@ -123,12 +123,12 @@ object MovieLensALS {
     }
 
     // Task 4. Extra Filtering
-//    val countRatings = (y: Rating) => {
-//      val count = ratingsData.filter(x => x.product == y.product).count()
-//      println(count)
-//      count
-//    }
-//    ratingsData = ratingsData.filter(x => countRatings(x) > 50)
+    //    val countRatings = (y: Rating) => {
+    //      val count = ratingsData.filter(x => x.product == y.product).count()
+    //      println(count)
+    //      count
+    //    }
+    //    ratingsData = ratingsData.filter(x => countRatings(x) > 50)
 
     val countRatings = (y: Rating) => {
       val count = ratingsData.filter(x => x.product == y.product).count()
@@ -231,8 +231,7 @@ object MovieLensALS {
   def rmse(test: RDD[Rating], prediction: scala.collection.Map[Int, Double]) = {
     // Task 0.2. Complete the code
     val rating_pairs = test
-      .map(x => (x.rating, prediction.get(x.product).asInstanceOf[Double]))
-
+      .map(x => (x.rating, prediction.getOrElse(x.product, 0)))
     math.sqrt(rating_pairs
       .map(x => (x._1 - x._2) * (x._1 - x._2))
       .reduce(_ + _) / test.count())
