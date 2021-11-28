@@ -90,26 +90,15 @@ object MovieLensALS {
     val usageString = "\n\nUsage: path/to/spark-submit path/to/jar movie/lens/data/path -user [true/false]\n\n"
 
     // instances instantiated with var can be modified
-    var doGrading = false
+    var doGrading = args(1)=="true"
 
     val rank = args(2).toInt
 
     // first array element fetched using round brackets
     val ratingsPath = args(0)
 
-    var proceed = true
 
     if (args.length != 3) {
-      proceed = false
-    }
-    if (args(1) == "-user")
-      try {
-        doGrading = args(2).toBoolean
-      } catch {
-        case e: Exception => proceed = false
-      }
-
-    if (!proceed) {
       println(usageString)
       sys.exit(1)
     }
@@ -134,8 +123,22 @@ object MovieLensALS {
     }
 
     // Task 4. Extra Filtering
-    val films  = ratingsData.map(x => x.product).countByValue().filter(x => x._2 > 50).toArray.map(x=>x._1)
-    ratingsData = ratingsData.filter(x => films.contains(x.product))
+//    val countRatings = (y: Rating) => {
+//      val count = ratingsData.filter(x => x.product == y.product).count()
+//      println(count)
+//      count
+//    }
+//    ratingsData = ratingsData.filter(x => countRatings(x) > 50)
+
+    val countRatings = (y: Rating) => {
+      val count = ratingsData.filter(x => x.product == y.product).count()
+      println(count)
+      count
+    }
+    val films = ratingsData.map(x => (x, countRatings(x)))
+    val ratings = films.filter(x => x._2 > 50)
+    ratingsData = ratings.map(x => x._1)
+
     // End of Task 4. Extra Filtering
 
     // calculate baseline for movie ratings
