@@ -13,7 +13,7 @@ object MovieLensALS {
     Logger.getLogger("org.apache.spark").setLevel(Level.ERROR)
 
     // unpack tuple returned by parseArgs
-    val (ratingsPath, doGrading) = parseArgs(args)
+    val (ratingsPath, doGrading, rank) = parseArgs(args)
 
     // set up environment
     val conf = new SparkConf()
@@ -21,7 +21,6 @@ object MovieLensALS {
     val sc = new SparkContext(conf)
 
     // if user flag is set, survey user for movie preferences
-    // TODO: film_id, rating
     val myRating = if (doGrading)
     // will generate user_rating.tsv (NOT user_ratings)
       (new Grader(ratingsPath, sc)).toRDD
@@ -36,7 +35,7 @@ object MovieLensALS {
     // train a matrix factorization model
     // user should be in training data split. otherwise preference prediction is impossible
     // two parameters are rank (specifies complexity) and iterations
-    val model = ALS.train(train.union(myRating), 10, 10)
+    val model = ALS.train(train.union(myRating), rank, 10)
 
     // https://spark.apache.org/docs/2.3.2/api/java/org/apache/spark/mllib/recommendation/MatrixFactorizationModel.html#predict-org.apache.spark.rdd.RDD-
     val prediction = model.predict(test.map(x => (x.user, x.product)))
@@ -93,6 +92,8 @@ object MovieLensALS {
     // instances instantiated with var can be modified
     var doGrading = false
 
+    val rank = args(2).toInt
+
     // first array element fetched using round brackets
     val ratingsPath = args(0)
 
@@ -114,7 +115,7 @@ object MovieLensALS {
     }
 
     // return tuple
-    (ratingsPath, doGrading)
+    (ratingsPath, doGrading, rank)
   }
 
 
