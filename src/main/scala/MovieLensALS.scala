@@ -134,8 +134,8 @@ object MovieLensALS {
     }
 
     // Task 4. Extra Filtering
-    val countRatings = (y: Rating) => ratingsData.filter(x => x.product == y.product).count()
-    ratingsData = ratingsData.filter(x => countRatings(x) > 50)
+    val films  = ratingsData.map(x => x.product).countByValue().filter(x => x._2 > 50).toArray.map(x=>x._1)
+    ratingsData = ratingsData.filter(x => films.contains(x.product))
     // End of Task 4. Extra Filtering
 
     // calculate baseline for movie ratings
