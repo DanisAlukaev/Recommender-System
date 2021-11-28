@@ -1,9 +1,10 @@
 import org.apache.spark.SparkContext
 import org.apache.spark.mllib.recommendation.Rating
-import scala.util.Random
 
+import scala.util.Random
 import java.io.File
 import java.io.PrintWriter
+import scala.util.matching.Regex
 
 
 class Grader(path: String, sc: SparkContext) {
@@ -13,8 +14,10 @@ class Grader(path: String, sc: SparkContext) {
   val films = Random.shuffle(
     sc
       .textFile(path + "/for-grading.tsv")
-      .map{_.split("\t")}
-      .map{x => (x(0).toInt, x(1))}
+      .map {
+        _.split("\t")
+      }
+      .map { x => (x(0).toInt, x(1)) }
       .collect()
       .toSeq
   )
@@ -29,56 +32,67 @@ class Grader(path: String, sc: SparkContext) {
   var step = 0
   var limit = 20
 
-  while (step < limit) {
+  // Task 2. Load movie preferences
+  println("Do you want to load your preferences?")
+  val answer = scala.io.StdIn.readLine()
+  val answerPattern: Regex = "^(y|yes)$".r
 
-    println(s"\nGraded ${step}/${limit}, Viewed ${position}/${films.length}")
-    println(s"${grading_message}\n${films(position)._2}")
+  def loadPreferences() = {
+    println("Loading from user_rating.tsv...")
+    graded = sc.textFile(path + "/user_rating.tsv")
+      .map(line => line.split("\t"))
+      .map(x => (x(0).toInt, x(1).toDouble))
+      .collect()
+  }
 
-    var grade = scala.io.StdIn.readLine()
+  def predictPreferences() = {
+    while (step < limit) {
+      println(s"\nGraded ${step}/${limit}, Viewed ${position}/${films.length}")
+      println(s"${grading_message}\n${films(position)._2}")
+      var grade = scala.io.StdIn.readLine()
 
-    try {
+      try {
+        var intGrade = grade.toDouble
 
-      var intGrade = grade.toDouble
-
-      if (intGrade < 0.0 || intGrade > 5.0) {
-        throw new NumberFormatException()
-      }
-
-      if (intGrade != 0) {
-        graded = graded :+ (films(position)._1, intGrade)
-        step += 1
-        position += 1
-      } else {
-        position += 1
-      }
-
-      if (position == films.length) {
-        step = limit + 1
-        println("\nNo more movies to grade\n")
-      }
-
-      if (step == limit) {
-
-        println("Grade 20 more? y/[n]")
-        var ans = scala.io.StdIn.readLine()
-
-        if (ans == "y" || ans == "yes" || ans == "Yes" || ans == "YES") {
-          limit += 20
-        } else {
-          println("\nFinished Grading\n")
+        if (intGrade < 0.0 || intGrade > 5.0) {
+          throw new NumberFormatException()
         }
 
+        if (intGrade != 0) {
+          graded = graded :+ (films(position)._1, intGrade)
+          step += 1
+          position += 1
+        } else {
+          position += 1
+        }
+
+        if (position == films.length) {
+          step = limit + 1
+          println("\nNo more movies to grade\n")
+        }
+
+        if (step == limit) {
+          println("Grade 20 more? y/[n]")
+          var ans = scala.io.StdIn.readLine()
+
+          if (ans == "y" || ans == "yes" || ans == "Yes" || ans == "YES") {
+            limit += 20
+          } else {
+            println("\nFinished Grading\n")
+          }
+        }
+      } catch {
+        case e: NumberFormatException => println("Try again")
+        case e: Exception => println("Unknown Error")
       }
-
-    } catch {
-
-      case e: NumberFormatException => println("Try again")
-      case e: Exception => println("Unknown Error")
-
+      dumpRatings()
     }
+  }
+  // End of Task 2. Load movie preferences
 
-    dumpRatings()
-
+  answerPattern.findFirstMatchIn(answer.trim().toLowerCase()) match {
+    case Some(_) => loadPreferences()
+    case None => predictPreferences()
   }
 
   def printRatings(): Unit = {
@@ -95,6 +109,6 @@ class Grader(path: String, sc: SparkContext) {
   }
 
   def toRDD = {
-    sc.parallelize(this.graded.map{x => Rating(0, x._1, x._2)})
+    sc.parallelize(this.graded.map { x => Rating(0, x._1, x._2) })
   }
 }

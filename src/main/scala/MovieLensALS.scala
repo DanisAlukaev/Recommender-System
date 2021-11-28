@@ -21,7 +21,9 @@ object MovieLensALS {
     val sc = new SparkContext(conf)
 
     // if user flag is set, survey user for movie preferences
+    // TODO: film_id, rating
     val myRating = if (doGrading)
+    // will generate user_rating.tsv (NOT user_ratings)
       (new Grader(ratingsPath, sc)).toRDD
     else
     // else create user with no preferences
@@ -35,7 +37,6 @@ object MovieLensALS {
     // user should be in training data split. otherwise preference prediction is impossible
     // two parameters are rank (specifies complexity) and iterations
     val model = ALS.train(train.union(myRating), 10, 10)
-
 
     // https://spark.apache.org/docs/2.3.2/api/java/org/apache/spark/mllib/recommendation/MatrixFactorizationModel.html#predict-org.apache.spark.rdd.RDD-
     val prediction = model.predict(test.map(x => (x.user, x.product)))
@@ -57,9 +58,19 @@ object MovieLensALS {
     if (doGrading) {
       println("Predictions for user\n")
 
+      // Task 1. Post-processing
+      // collect all movie ids in user rating
+      val filmIds = sc.textFile(ratingsPath + "/user_rating.tsv")
+        .map(line => line.split("\t"))
+        .map(x => x(0).toInt)
+        .collect()
+
       // for input data format refer to documentation
       // get movie ids to rank from baseline map
       model.predict(sc.parallelize(baseline.keys.map(x => (0, x)).toSeq))
+        // Task 1. Post-processing
+        // filter watched movies
+        .filter(x => !sc.broadcast(filmIds).value.contains(x.product))
         // sort by ratings in descending order
         .sortBy(_.rating, false)
         // take first 20 items
@@ -67,6 +78,7 @@ object MovieLensALS {
         // print title and predicted rating
         .foreach(x => println(s"${filmId2Title(x.product)}\t\t${x.rating}"))
     }
+    // End of Task 1. Post-processing
 
     sc.stop()
   }
@@ -111,7 +123,7 @@ object MovieLensALS {
     // the file of interest (that contains ratings) is located in HDFS
     // files from HDFS are read with SparkContext's method textFile
     // by default textFile return RDD[String] ([] - specify template parameters)
-    val ratingsData = sc.textFile(path).map { line =>
+    var ratingsData = sc.textFile(path).map { line =>
       val fields = line.split(",")
       // file data format is
       // userID, movieID, movieRating, time
@@ -119,6 +131,11 @@ object MovieLensALS {
       // https://spark.apache.org/docs/2.3.2/api/java/org/apache/spark/mllib/recommendation/Rating.html
       Rating(fields(0).toInt, fields(1).toInt, fields(2).toDouble)
     }
+
+    // Task 4. Extra Filtering
+    val countRatings = (y: Rating) => ratingsData.filter(x => x.product == y.product).count()
+    ratingsData = ratingsData.filter(x => countRatings(x) > 50)
+    // End of Task 4. Extra Filtering
 
     // calculate baseline for movie ratings
     // let's agree that the baseline is the average rating for the movie
@@ -185,8 +202,11 @@ object MovieLensALS {
 
 
   def parseTitle(filmEntry: String) = {
-    val filmTitle = (filmEntry.split(',').map(_.trim)).lift(1);
-    filmTitle;
+    // Task 0.1. Complete the code
+    "\".*\"".r findFirstIn filmEntry match {
+      case Some(s) => s.replace("\"", "")
+      case None => filmEntry.split(",").map(_.trim).lift(1)
+    }
   }
 
 
@@ -205,12 +225,12 @@ object MovieLensALS {
   }
 
   def rmse(test: RDD[Rating], prediction: scala.collection.Map[Int, Double]) = {
+    // Task 0.2. Complete the code
     val rating_pairs = test
       .map(x => (x.rating, prediction.get(x.product).asInstanceOf[Double]))
 
     math.sqrt(rating_pairs
       .map(x => (x._1 - x._2) * (x._1 - x._2))
-      // _ + _ is equivalent to the lambda (x,y) => x+y
       .reduce(_ + _) / test.count())
   }
 }
