@@ -191,11 +191,12 @@ object MovieLensALS {
 
 
   def rmse(test: RDD[Rating], prediction: RDD[Rating]) = {
+    val tuples = test.map(x => ((x.user, x.product), x.rating))
     val rating_pairs = prediction
       .map(x => ((x.user, x.product), x.rating))
       // more about join
       // https://spark.apache.org/docs/2.1.1/api/java/org/apache/spark/rdd/PairRDDFunctions.html#join(org.apache.spark.rdd.RDD)
-      .join(test.map(x => ((x.user, x.product), x.rating)))
+      .join(tuples)
 
     math.sqrt(rating_pairs.values
       .map(x => (x._1 - x._2) * (x._1 - x._2))
@@ -204,8 +205,12 @@ object MovieLensALS {
   }
 
   def rmse(test: RDD[Rating], prediction: scala.collection.Map[Int, Double]) = {
-    0.0
+    val rating_pairs = test
+      .map(x => (x.rating, prediction.get(x.product).asInstanceOf[Double]))
+
+    math.sqrt(rating_pairs
+      .map(x => (x._1 - x._2) * (x._1 - x._2))
+      // _ + _ is equivalent to the lambda (x,y) => x+y
+      .reduce(_ + _) / test.count())
   }
-
-
 }
