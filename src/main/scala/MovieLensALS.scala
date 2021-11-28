@@ -22,10 +22,10 @@ object MovieLensALS {
 
     // if user flag is set, survey user for movie preferences
     val myRating = if (doGrading)
-        (new Grader(ratingsPath, sc)).toRDD
-      else
+      (new Grader(ratingsPath, sc)).toRDD
+    else
     // else create user with no preferences
-        sc.parallelize(Seq[Rating]())
+      sc.parallelize(Seq[Rating]())
 
     // Read dataset into memory. For more information, view comments in loadFilms and loadRatings
     val filmId2Title = loadFilms(ratingsPath + "/movies2.csv", sc)
@@ -54,7 +54,7 @@ object MovieLensALS {
 
     // if user preferences are specified, predict top 20 movies for the user
     // default user id = 0. the same user id is set in Grader.scala
-    if (doGrading){
+    if (doGrading) {
       println("Predictions for user\n")
 
       // for input data format refer to documentation
@@ -90,7 +90,7 @@ object MovieLensALS {
       proceed = false
     }
     if (args(1) == "-user")
-      try{
+      try {
         doGrading = args(2).toBoolean
       } catch {
         case e: Exception => proceed = false
@@ -106,13 +106,12 @@ object MovieLensALS {
   }
 
 
-
   def loadRatings(path: String, sc: SparkContext) = {
 
     // the file of interest (that contains ratings) is located in HDFS
     // files from HDFS are read with SparkContext's method textFile
     // by default textFile return RDD[String] ([] - specify template parameters)
-    val ratingsData = sc.textFile(path).map{ line =>
+    val ratingsData = sc.textFile(path).map { line =>
       val fields = line.split(",")
       // file data format is
       // userID, movieID, movieRating, time
@@ -131,7 +130,7 @@ object MovieLensALS {
     val baseline = ratingsData
       // transform data in the format (movieId, (rating, 1))
       // 1 is needed to count the number of ratings
-      .map(x => (x.product, (x.rating, 1:Int)))
+      .map(x => (x.product, (x.rating, 1: Int)))
       // reduce by key
       // https://spark.apache.org/docs/latest/rdd-programming-guide.html#working-with-key-value-pairs
       .reduceByKey((x, y) => (x._1 + y._1, x._2 + y._2))
@@ -174,11 +173,11 @@ object MovieLensALS {
     // findFirstIn in particular refer to
     // https://www.scala-lang.org/api/2.12.5/scala/util/matching/Regex.html
     "^[0-9]*,".r findFirstIn filmEntry match {
-        // match is an equivalent of case switch
-        // https://docs.scala-lang.org/tour/pattern-matching.html
+      // match is an equivalent of case switch
+      // https://docs.scala-lang.org/tour/pattern-matching.html
 
-        // what is Some() and how to use it
-        // https://alvinalexander.com/scala/using-scala-option-some-none-idiom-function-java-null
+      // what is Some() and how to use it
+      // https://alvinalexander.com/scala/using-scala-option-some-none-idiom-function-java-null
       case Some(s) => s.slice(0, s.length - 1).toInt
       case None => throw new Exception(s"Cannot parse Id in {$filmEntry}")
     }
@@ -186,7 +185,8 @@ object MovieLensALS {
 
 
   def parseTitle(filmEntry: String) = {
-    ""
+    val filmTitle = (filmEntry.split(',').map(_.trim)).lift(1);
+    filmTitle;
   }
 
 
@@ -206,7 +206,6 @@ object MovieLensALS {
   def rmse(test: RDD[Rating], prediction: scala.collection.Map[Int, Double]) = {
     0.0
   }
-
 
 
 }
