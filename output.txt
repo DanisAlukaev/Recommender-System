@@ -1,0 +1,70 @@
+vagrant@ubuntu1804:~$ spark-submit --driver-memory 4g /home/vagrant/binary.jar . true 8
+2021-11-29 00:58:39,942 WARN util.NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable
+2021-11-29 00:58:41,040 INFO util.log: Logging initialized @2354ms to org.sparkproject.jetty.util.log.Slf4jLog
+2021-11-29 00:58:41,150 INFO server.Server: jetty-9.4.43.v20210629; built: 2021-06-30T11:07:22.254Z; git: 526006ecfa3af7f1a27ef3a288e2bef7ea9dd7e8; jvm 1.8.0_191-8u191-b12-0ubuntu0.18.04.1-b12
+2021-11-29 00:58:41,173 INFO server.Server: Started @2488ms
+2021-11-29 00:58:41,215 INFO server.AbstractConnector: Started ServerConnector@7a9403cd{HTTP/1.1, (http/1.1)}{master:4040}
+2021-11-29 00:58:41,247 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@682bd3c4{/jobs,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,251 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@7fab4be7{/jobs/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,253 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@4d74c3ba{/jobs/job,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,256 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@22d9c961{/jobs/job/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,257 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@bdc8014{/stages,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,258 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@73ba6fe6{/stages/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,259 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@1698d7c0{/stages/stage,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,260 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@782168b7{/stages/stage/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,261 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@7435a578{/stages/pool,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,262 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@13047d7d{/stages/pool/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,263 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@65bb9029{/storage,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,264 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@2b214b94{/storage/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,265 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@49601f82{/storage/rdd,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,265 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@2b8d084{/storage/rdd/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,266 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@24fabd0f{/environment,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,267 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@61f3fbb8{/environment/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,269 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@432034a{/executors,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,270 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@60e5272{/executors/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,270 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@69c93ca4{/executors/threadDump,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,271 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@173373b4{/executors/threadDump/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,283 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@60dd3c23{/static,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,284 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@3b6c624{/,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,286 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@c81fd12{/api,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,287 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@652ab8d9{/jobs/job/kill,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,288 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@51e0301d{/stages/stage/kill,null,AVAILABLE,@Spark}
+2021-11-29 00:58:41,631 INFO handler.ContextHandler: Started o.s.j.s.ServletContextHandler@26a262d6{/metrics/json,null,AVAILABLE,@Spark}
+2021-11-29 00:58:43,084 INFO mapred.FileInputFormat: Total input files to process : 1
+Do you want to load your preferences?
+yes
+Loading from user_rating.tsv...
+2021-11-29 00:59:23,490 INFO mapred.FileInputFormat: Total input files to process : 1
+2021-11-29 00:59:23,657 INFO mapred.FileInputFormat: Total input files to process : 1
+2021-11-29 00:59:24,369 INFO mapred.FileInputFormat: Total input files to process : 1
+2021-11-29 01:41:27,331 WARN netlib.InstanceBuilder$NativeBLAS: Failed to load implementation from:dev.ludovic.netlib.blas.JNIBLAS
+2021-11-29 01:41:27,428 WARN netlib.InstanceBuilder$NativeBLAS: Failed to load implementation from:dev.ludovic.netlib.blas.ForeignLinkerBLAS
+2021-11-29 01:41:29,594 WARN netlib.InstanceBuilder$NativeLAPACK: Failed to load implementation from:dev.ludovic.netlib.lapack.JNILAPACK
+Error after training: 0.7960515034914764
+Baseline error: 0.9401612943188816
+
+
+
+Predictions for user
+
+rated Film set
+Waking Sleeping Beauty (2009)	6.9048638079205.04
+Crackerjack (2002)	6.712372615193852 
+Babylon 5	6,490130249601826
+Jerry Seinfeld: 'I'm Telling You for the Last Time: (1999)	6,349153154264261
+Caddyshack (1980)	6.215247685944702
+Ricky Gervais Live 2: Politics (2004)	6,898450176877387
+Bachelor Mother (1939)	6,018781111053407
+Airplane! (1980)	6.003938261506843
+Animal House (1978)	5.933163901777588
+Austin Powers: International Man of Mystery (1997)	5.80040662095541
+"Westerner	5.88040162085132
+Frank and Ollie (1995)	5.820218920080468
+To Hell and Back (1955)	5.821852373094306
+Berbarosa (1982)	5.782903817906129
+Toy Story 2 (1999) 5.682814657207482
+"Christmas Story	5.6327350517929665
+Jaws (1975)	5.608790866884642
+There's Something About Mary (1998)	5.5521389240838985
+Phish: Bittersweet Motel (2000)	5.547876532681107
+Way Out West (1937)	5.507782700170507

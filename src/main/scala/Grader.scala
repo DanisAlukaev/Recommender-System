@@ -101,7 +101,7 @@ class Grader(path: String, sc: SparkContext) {
   }
 
   def dumpRatings() = {
-    val ratings_file = "user_ratings.tsv"
+    val ratings_file = "user_rating.tsv"
     println(s"Saving ratings to ${ratings_file}\n")
     val writer = new PrintWriter(new File(ratings_file))
     this.graded.foreach(x => writer.write(s"${x._1}\t${x._2}\n"))

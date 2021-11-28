@@ -69,7 +69,7 @@ object MovieLensALS {
       model.predict(sc.parallelize(baseline.keys.map(x => (0, x)).toSeq))
         // Task 1. Post-processing
         // filter watched movies
-        .filter(x => !sc.broadcast(filmIds).value.contains(x.product))
+        .filter(x => !filmIds.contains(x.product))
         // sort by ratings in descending order
         .sortBy(_.rating, false)
         // take first 20 items
@@ -90,7 +90,7 @@ object MovieLensALS {
     val usageString = "\n\nUsage: path/to/spark-submit path/to/jar movie/lens/data/path -user [true/false]\n\n"
 
     // instances instantiated with var can be modified
-    var doGrading = args(1) == "true"
+    var doGrading = args(1)=="true"
 
     val rank = args(2).toInt
 
@@ -123,22 +123,8 @@ object MovieLensALS {
     }
 
     // Task 4. Extra Filtering
-    //    val countRatings = (y: Rating) => {
-    //      val count = ratingsData.filter(x => x.product == y.product).count()
-    //      println(count)
-    //      count
-    //    }
-    //    ratingsData = ratingsData.filter(x => countRatings(x) > 50)
-
-    val countRatings = (y: Rating) => {
-      val count = ratingsData.filter(x => x.product == y.product).count()
-      println(count)
-      count
-    }
-    val films = ratingsData.map(x => (x, countRatings(x)))
-    val ratings = films.filter(x => x._2 > 50)
-    ratingsData = ratings.map(x => x._1)
-
+    val films  = ratingsData.map(x => x.product).countByValue().filter(x => x._2 > 50).toArray.map(x=>x._1)
+    ratingsData = ratingsData.filter(x => films.contains(x.product))
     // End of Task 4. Extra Filtering
 
     // calculate baseline for movie ratings
@@ -231,7 +217,9 @@ object MovieLensALS {
   def rmse(test: RDD[Rating], prediction: scala.collection.Map[Int, Double]) = {
     // Task 0.2. Complete the code
     val rating_pairs = test
-      .map(x => (x.rating, prediction.getOrElse(x.product, 0)))
+      .map(x => (x.rating, prediction.getOrElse(x.product, 0.0)))
+//case Some(s) => s.slice(0, s.length - 1).toInt
+    //      case None => throw new Exception(s"Cannot parse Id in {$filmEntry}")
     math.sqrt(rating_pairs
       .map(x => (x._1 - x._2) * (x._1 - x._2))
       .reduce(_ + _) / test.count())
